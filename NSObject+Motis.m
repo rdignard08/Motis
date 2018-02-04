@@ -25,32 +25,6 @@
 #define MJLog(format, ...)
 #endif
 
-
-// ------------------------------------------------------------------------------------------------------------------------------------------------------------------ //
-// ------------------------------------------------------------------------------------------------------------------------------------------------------------------ //
-// ------------------------------------------------------------------------------------------------------------------------------------------------------------------ //
-
-static NSString* stringFromClass(Class theClass)
-{
-    static NSMapTable *map = nil;
-    static dispatch_once_t onceToken;
-    dispatch_once(&onceToken, ^{
-        map = [NSMapTable mapTableWithKeyOptions:NSPointerFunctionsWeakMemory valueOptions:NSPointerFunctionsStrongMemory];
-    });
-    
-    NSString *string = nil;
-    @synchronized(map)
-    {
-        string = [map objectForKey:theClass];
-        if (!string)
-        {
-            string = NSStringFromClass(theClass);
-            [map setObject:string forKey:theClass];
-        }
-    }
-    return string;
-}
-
 // ------------------------------------------------------------------------------------------------------------------------------------------------------------------ //
 // ------------------------------------------------------------------------------------------------------------------------------------------------------------------ //
 // ------------------------------------------------------------------------------------------------------------------------------------------------------------------ //
@@ -637,7 +611,7 @@ static void mts_motisInitialization()
     // TODO: This synchronization must be optimized
     @synchronized(mappings)
     {
-        NSString *className = stringFromClass(self);
+        NSString *className = NSStringFromClass(self);
         NSDictionary *mapping = mappings[className];
         
         if (!mapping)
@@ -671,7 +645,7 @@ static void mts_motisInitialization()
     
     @synchronized(valueMappings)
     {
-        NSString *className = stringFromClass(self);
+        NSString *className = NSStringFromClass(self);
         NSMutableDictionary *classValueMappings = valueMappings[className];
         
         if (!classValueMappings)
@@ -714,7 +688,7 @@ static void mts_motisInitialization()
     // TODO: This synchronization must be optimized
     @synchronized(arrayClassMappings)
     {
-        NSString *className = stringFromClass(self);
+        NSString *className = NSStringFromClass(self);
         NSDictionary *arrayClassMapping = arrayClassMappings[className];
         
         if (!arrayClassMapping)
@@ -749,7 +723,7 @@ static void mts_motisInitialization()
     // TODO: This synchronization must be optimized
     @synchronized(classKeyPaths)
     {
-        NSString *className = stringFromClass(self);
+        NSString *className = NSStringFromClass(self);
         NSDictionary *keyPaths = classKeyPaths[className];
         
         if (!keyPaths)
@@ -797,11 +771,11 @@ static void mts_motisInitialization()
     // TODO: This synchronization must be optimized
     @synchronized(typeAttributes)
     {
-        NSMutableDictionary *classTypeAttributes = typeAttributes[stringFromClass(self.class)];
+        NSMutableDictionary *classTypeAttributes = typeAttributes[NSStringFromClass(self.class)];
         if (!classTypeAttributes)
         {
             classTypeAttributes = [NSMutableDictionary dictionary];
-            typeAttributes[stringFromClass(self.class)] = classTypeAttributes;
+            typeAttributes[NSStringFromClass(self.class)] = classTypeAttributes;
         }
         
         NSString *typeAttribute = classTypeAttributes[key];
@@ -950,7 +924,7 @@ static void mts_motisInitialization()
             
             if (typeClass)
             {
-                MJLog(@"%@ --> %@", key, stringFromClass(typeClass));
+                MJLog(@"%@ --> %@", key, NSStringFromClass(typeClass));
                 return [self mts_validateAutomaticallyValue:ioValue toClass:typeClass forKey:key];
             }
         }
