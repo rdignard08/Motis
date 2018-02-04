@@ -51,27 +51,6 @@ static NSString* stringFromClass(Class theClass)
     return string;
 }
 
-static Class classFromString(NSString *string)
-{
-    static NSMapTable *map = nil;
-    static dispatch_once_t onceToken;
-    dispatch_once(&onceToken, ^{
-        map = [NSMapTable mapTableWithKeyOptions:NSPointerFunctionsStrongMemory valueOptions:NSPointerFunctionsWeakMemory];
-    });
-    
-    Class theClass = nil;
-    @synchronized(map)
-    {
-        theClass = [map objectForKey:string];
-        if (!theClass)
-        {
-            theClass = NSClassFromString(string);
-            [map setObject:theClass forKey:string];
-        }
-    }
-    return theClass;
-}
-
 // ------------------------------------------------------------------------------------------------------------------------------------------------------------------ //
 // ------------------------------------------------------------------------------------------------------------------------------------------------------------------ //
 // ------------------------------------------------------------------------------------------------------------------------------------------------------------------ //
@@ -967,7 +946,7 @@ static void mts_motisInitialization()
         }
         else
         {
-            Class typeClass = classFromString(className);
+            Class typeClass = NSClassFromString(className);
             
             if (typeClass)
             {
