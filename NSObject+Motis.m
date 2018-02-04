@@ -596,8 +596,6 @@ static void mts_motisInitialization()
     [NSObject mts_cachedMapping];
     [NSObject mts_cachedArrayClassMapping];
     [NSObject mts_keyPaths];
-    [NSObject mts_decimalFormatterAllowFloats];
-    [NSObject mts_decimalFormatterNoFloats];
 }
 
 + (NSDictionary*)mts_cachedMapping
