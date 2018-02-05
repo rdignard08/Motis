@@ -590,17 +590,9 @@
 
 @implementation NSObject (Motis_Private)
 
-__attribute__((constructor))
-static void mts_motisInitialization()
-{
-    [NSObject mts_cachedMapping];
-    [NSObject mts_cachedArrayClassMapping];
-    [NSObject mts_keyPaths];
-}
-
 + (NSDictionary*)mts_cachedMapping
 {
-    static NSMutableDictionary *mappings = nil;
+    static NSMutableDictionary<Class, NSDictionary *> *mappings = nil;
     static dispatch_once_t onceToken1;
     dispatch_once(&onceToken1, ^{
         mappings = [NSMutableDictionary dictionary];
@@ -609,8 +601,7 @@ static void mts_motisInitialization()
     // TODO: This synchronization must be optimized
     @synchronized(mappings)
     {
-        NSString *className = NSStringFromClass(self);
-        NSDictionary *mapping = mappings[className];
+        NSDictionary *mapping = mappings[self];
         
         if (!mapping)
         {
@@ -626,7 +617,7 @@ static void mts_motisInitialization()
             [dictionary addEntriesFromDictionary:[self mts_mapping]];
             
             mapping = [dictionary copy];
-            mappings[className] = mapping;
+            mappings[self] = mapping;
         }
         
         return mapping;
@@ -635,7 +626,7 @@ static void mts_motisInitialization()
 
 + (NSDictionary*)mts_cachedValueMappingForKey:(NSString*)key
 {
-    static NSMutableDictionary *valueMappings = nil;
+    static NSMutableDictionary<Class, NSMutableDictionary *> *valueMappings = nil;
     static dispatch_once_t onceToken1;
     dispatch_once(&onceToken1, ^{
         valueMappings = [NSMutableDictionary dictionary];
@@ -643,13 +634,12 @@ static void mts_motisInitialization()
     
     @synchronized(valueMappings)
     {
-        NSString *className = NSStringFromClass(self);
-        NSMutableDictionary *classValueMappings = valueMappings[className];
+        NSMutableDictionary *classValueMappings = valueMappings[self];
         
         if (!classValueMappings)
         {
             classValueMappings = [NSMutableDictionary dictionary];
-            valueMappings[className] = classValueMappings;
+            valueMappings[self] = classValueMappings;
         }
         
         NSMutableDictionary *valueMapping = classValueMappings[key];
